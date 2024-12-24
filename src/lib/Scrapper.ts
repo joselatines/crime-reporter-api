@@ -86,7 +86,7 @@ export default class Scrapper {
 	public async scrapeNTN24(url = "https://www.ntn24.com/noticias-judicial") {
 		try {
 			this.browser = await puppeteer.launch({
-				headless: false,
+				headless: true,
 				args: [
 					"--disable-setuid-sandbox",
 					"--no-sandbox",
