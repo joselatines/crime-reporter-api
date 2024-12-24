@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import puppeteer, { Browser } from "puppeteer";
+import { News } from "./db/models/News";
 
 export default class Scrapper {
 	browser: Browser = null;
@@ -10,8 +11,6 @@ export default class Scrapper {
 	public async scrapeUltimasNoticias(
 		url = "https://ultimasnoticias.com.ve/seccion/sucesos/"
 	) {
-		console.log("probando");
-
 		const browser = await puppeteer.launch({ headless: true });
 		const page = await browser.newPage();
 		// Interceptar mensajes de consola dentro del navegador
@@ -33,18 +32,38 @@ export default class Scrapper {
 					.querySelector(".td-excerpt")
 					?.textContent.trim();
 				const link = article.querySelector(".entry-title a")?.href;
-
+				const imgUrl = article
+					.querySelector(".entry-thumb.td-thumb-css")
+					?.getAttribute("data-img-url");
+				const publishedAt = article
+					.querySelector(".entry-date.updated.td-module-date")
+					?.getAttribute("datetime");
+				const author = article
+					.querySelector(".td-post-author-name a")
+					?.textContent.trim();
+				const authorUrl = article.querySelector(".td-post-author-name a")?.href;
 				return {
 					title,
 					description,
-					link,
+					url: link,
+					imgUrl,
+					authorUrl,
+					author,
+					publishedAt
 				};
 			});
 			return data;
 		});
-		console.log(newsData);
 
 		await browser.close();
+
+		newsData.forEach((news: any) => {
+			const newNews = new News(news);
+			newNews
+				.save()
+				.then(() => console.log(`New news saved: ${newNews}`))
+				.catch(e => console.log(e));
+		});
 
 		// Return the scraped data
 		return newsData;
