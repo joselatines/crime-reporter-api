@@ -1,8 +1,8 @@
-import express, { Request } from "express";
-const app = express();
+import app from './app';
 
-app.get("/", (req: Request, res: any) => res.send("Express on Vercel"));
-
-app.listen(3000, () => console.log("Server ready on port 3000."));
-
-export default app;
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  /* eslint-disable no-console */
+  console.log(`Listening: http://localhost:${port}`);
+  /* eslint-enable no-console */
+});
