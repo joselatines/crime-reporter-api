@@ -12,7 +12,19 @@ export default class Scrapper {
 		url = "https://ultimasnoticias.com.ve/seccion/sucesos/"
 	) {
 		console.log("Scrapping starting");
-		const browser = await puppeteer.launch({ headless: true });
+		const browser = await puppeteer.launch({
+			headless: true,
+			args: [
+				"--disable-setuid-sandbox",
+				"--no-sandbox",
+				"--single-process",
+				"--no-zygote",
+			],
+			executablePath:
+				process.env.NODE_ENV === "production"
+					? process.env.PUPPETEER_EXECUTABLE_PATH
+					: puppeteer.executablePath(),
+		});
 		console.log("Opening page");
 		const page = await browser.newPage();
 		// Interceptar mensajes de consola dentro del navegador
@@ -73,6 +85,19 @@ export default class Scrapper {
 	}
 	public async scrapeNTN24(url = "https://www.ntn24.com/noticias-judicial") {
 		try {
+			this.browser = await puppeteer.launch({
+				headless: false,
+				args: [
+					"--disable-setuid-sandbox",
+					"--no-sandbox",
+					"--single-process",
+					"--no-zygote",
+				],
+				executablePath:
+					process.env.NODE_ENV === "production"
+						? process.env.PUPPETEER_EXECUTABLE_PATH
+						: puppeteer.executablePath(),
+			});
 			const page = await this.browser.newPage();
 
 			// class container: container category-fold-3
@@ -81,7 +106,31 @@ export default class Scrapper {
 			const container = await page.$(".container.category-fold-3");
 
 			if (!container) throw new Error("Container not found");
-			const posts = container.$$(".post-v");
+			const posts = await container.evaluate(container => {
+				const posts = [];
+				const postElements = container.querySelectorAll(".post-v");
+				for (const postElement of postElements) {
+					const title = postElement.querySelector(".title")?.textContent;
+					const description = title;
+					const link = postElement
+						.querySelector(".title a")
+						?.getAttribute("href");
+					const imgUrl = postElement
+						.querySelector(".img-a img")
+						?.getAttribute("src");
+					const publishedAt = postElement.querySelector(".date")?.textContent;
+					posts.push({ title, description, link, imgUrl, publishedAt });
+				}
+				return posts;
+			});
+
+			posts.forEach((news: any) => {
+				const newNews = new News(news);
+				newNews
+					.save()
+					.then(() => console.log(`New news saved: ${newNews}`))
+					.catch(e => console.log(e));
+			});
 
 			console.log({ posts });
 		} catch (error) {}
