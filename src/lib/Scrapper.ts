@@ -11,15 +11,18 @@ export default class Scrapper {
 	public async scrapeUltimasNoticias(
 		url = "https://ultimasnoticias.com.ve/seccion/sucesos/"
 	) {
+		console.log("Scrapping starting");
 		const browser = await puppeteer.launch({ headless: true });
+		console.log("Opening page");
 		const page = await browser.newPage();
 		// Interceptar mensajes de consola dentro del navegador
-		// page.on("console", (msg: any) => console.log("PAGE LOG:", msg.text()));
+		page.on("console", (msg: any) => console.log("PAGE LOG:", msg.text()));
 
 		await page.goto(url, { timeout: 0 });
 		console.log("Conectado a ultima noticias");
 
 		// Targeting the DOM Nodes that contain the Digimon names
+		console.log("Scraping news");
 		const newsData = await page.evaluate(() => {
 			const articleElements = document.querySelectorAll(".td-module-container");
 			if (!articleElements) return [];
@@ -49,7 +52,7 @@ export default class Scrapper {
 					imgUrl,
 					authorUrl,
 					author,
-					publishedAt
+					publishedAt,
 				};
 			});
 			return data;

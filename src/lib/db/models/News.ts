@@ -10,7 +10,7 @@ const newsSchema = new mongoose.Schema({
 	publishedAt: String,
 	content: String,
 	author: String,
-	authorUrl: String
+	authorUrl: String,
 });
 
-export const News = mongoose.model('News', newsSchema);
+export const News = mongoose.model("News", newsSchema);
