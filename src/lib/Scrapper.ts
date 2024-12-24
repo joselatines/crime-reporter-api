@@ -12,7 +12,7 @@ export default class Scrapper {
 	) {
 		console.log("probando");
 
-		const browser = await puppeteer.launch({ headless: false });
+		const browser = await puppeteer.launch({ headless: true });
 		const page = await browser.newPage();
 		// Interceptar mensajes de consola dentro del navegador
 		// page.on("console", (msg: any) => console.log("PAGE LOG:", msg.text()));
