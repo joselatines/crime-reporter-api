@@ -26,6 +26,8 @@
     "helmet": "^8.0.0",
     "mongoose": "^8.9.2",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.16",
     "puppeteer": "^23.11.1"
   },
   "devDependencies": {
@@ -34,6 +36,7 @@
     "@types/jest": "^29.5.13",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.7.5",
+    "@types/nodemailer": "^6.4.17",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
