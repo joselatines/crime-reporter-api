@@ -4,6 +4,8 @@ import MessageResponse from '../interfaces/MessageResponse';
 import emojis from './emojis';
 import scrapings from './scrapings';
 import news from './news';
+import settings from './settings';
+
 
 
 
@@ -18,6 +20,8 @@ router.get<{}, MessageResponse>('/', (req, res) => {
 router.use('/emojis', emojis);
 router.use('/scrapings', scrapings);
 router.use('/news', news);
+router.use('/settings', settings);
+
 
 
 
