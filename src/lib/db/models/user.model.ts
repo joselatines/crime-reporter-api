@@ -8,6 +8,21 @@ export interface IUser extends Document {
   password: string;
   role: "admin" | "detective";
   isActive: boolean;
+  settings: Object;
+  newsWantedWords: string[];
+  notificationEmail: string;
+  notifications: {
+    id: string;
+    title: string;
+    description: string;
+    url: string;
+    news_id: mongoose.Schema.Types.ObjectId;
+    notification_to: string;
+    notification_type: string;
+    sended_at: Date;
+    viewed: boolean;
+    words_detected: string[];
+  }[];
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -38,6 +53,34 @@ const userSchema = new mongoose.Schema<IUser>({
   isActive: {
     type: Boolean,
     default: true,
+  },
+  settings: {
+    type: Object,
+    default: {}, // Default to an empty object
+  },
+  newsWantedWords: {
+    type: [String],
+    default: [], // Default to an empty array
+  },
+  notificationEmail: {
+    type: String,
+  },
+  notifications: {
+    type: [
+      {
+        id: String,
+        title: String,
+        description: String,
+        url: String,
+        news_id: mongoose.Schema.Types.ObjectId,
+        notification_to: String,
+        notification_type: String,
+        sended_at: Date,
+        viewed: Boolean,
+        words_detected: [String], // Array of detected words
+      },
+    ],
+    default: [], // Default to an empty array
   },
 }, { timestamps: true });
 

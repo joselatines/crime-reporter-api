@@ -4,7 +4,7 @@ import puppeteer, { Browser } from "puppeteer";
 import { NewsData } from "../interfaces/Database";
 import { News } from "./db/models/News";
 import { Notifier } from "./Notifiers";
-import { User } from "../lib/db/models/User";
+import User  from "../lib/db/models/user.model";
 import { NewsData } from "../interfaces/Database";
 import { randomUUID } from "crypto";
 
@@ -51,7 +51,7 @@ export default class Scrapper {
 				.catch(e => console.log(e));
 		});
 
-		await this.checkIfNewsHasKeywordsWantedForUsers(allNews);
+		await this.checkIfNewsHasKeywordsWantedForUsers(filteredNews);
 
 		console.debug(
 			`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: ${ntn24.length}`
