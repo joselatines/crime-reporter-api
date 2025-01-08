@@ -4,6 +4,8 @@ import MessageResponse from '../interfaces/MessageResponse';
 import emojis from './emojis';
 import scrapings from './scrapings';
 import news from './news';
+import settings from './settings';
+
 
 import authRoutes from '../routes/auth.routes';
 
@@ -19,6 +21,8 @@ router.use('/emojis', emojis);
 router.use('/scrapings', scrapings);
 router.use('/news', news);
 router.use('/auth', authRoutes);
+router.use('/settings', settings);
+
 
 
 

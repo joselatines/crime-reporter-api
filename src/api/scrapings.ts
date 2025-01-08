@@ -3,13 +3,12 @@ import Scrapper from "../lib/Scrapper";
 
 const router = express.Router();
 
-
-
-router.get<{}, any>("/", (req, res) => {
+router.get<{}, any>("/", async (req, res) => {
 	const scraper = new Scrapper();
-	scraper.scrapeUltimasNoticias();
-	scraper.scrapeNTN24();
-	res.json({message: "Scrapping starting"});
+	await scraper.init();
+	scraper.saveNewsIntoDatabase();
+
+	res.json({ message: "Scrapping starting", success: true });
 });
 
 export default router;
