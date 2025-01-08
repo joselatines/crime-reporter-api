@@ -1,5 +1,6 @@
 import express from 'express';
 import  User  from '../lib/db/models/user.model';
+import { getNotifications } from '../controllers/notifications.controller';
 
 const router = express.Router();
 
@@ -10,6 +11,11 @@ router.get<{}>('/', (req, res) => {
   res.send('Settings');
 });
 
+router.get('/notifications', (req, res) => {
+  res.send('Notifications');
+});
+
+router.get('/notifications/:userId', getNotifications);
 /**
  * PUT /notifications - Update wanted keywords and notification email
  */
