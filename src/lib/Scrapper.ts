@@ -4,6 +4,9 @@ import puppeteer, { Browser } from "puppeteer";
 import { NewsData } from "../interfaces/Database";
 import { News } from "./db/models/News";
 import { Notifier } from "./Notifiers";
+import { User } from "../lib/db/models/User";
+import { NewsData } from "../interfaces/Database";
+import { randomUUID } from "crypto";
 
 export default class Scrapper {
 	browser: Browser = null;
@@ -25,47 +28,106 @@ export default class Scrapper {
 	public async saveNewsIntoDatabase() {
 		console.log("Starting news scraping...");
 		const ultimasNoticias = await this.getNewsUltimasNoticias();
-		console.log("Finished scraping Ultimas Noticias");
 		const elNacional = await this.getNewsElNacional();
-		console.log("Finished scraping El Nacional");
 		const ntn24 = await this.getNewsNTN24();
-		console.log("Finished scraping NTN24");
 		const allNews = [...ultimasNoticias, ...elNacional, ...ntn24];
 
-		const filteredNews = allNews.filter(news => !this.isNewsInDb(news.title));
-		
+		const filteredNews = (
+			await Promise.all(
+				allNews.map(async news => ({
+					news,
+					exists: await this.isNewsInDb(news.title),
+				}))
+			)
+		)
+			.filter(({ exists }) => !exists)
+			.map(({ news }) => news);
+
 		filteredNews.forEach((news: NewsData) => {
 			const newNews = new News(news);
 			newNews
 				.save()
-				.then(() => console.log(`New news saved: ${newNews}`))
+				.then(() => console.log(`New news saved: ${newNews.title}`))
 				.catch(e => console.log(e));
 		});
 
-		const userKeyWords = ["asesinato", "corrupcion", "violencia", "terroristas", "chacao"];
+		await this.checkIfNewsHasKeywordsWantedForUsers(allNews);
 
-		filteredNews.forEach((news: NewsData) => {
-			// check if news have user saved tags
-			const title = news.title.toLocaleLowerCase();
-			const desc = news.description.toLocaleLowerCase();
+		console.debug(
+			`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: ${ntn24.length}`
+		);
+		console.debug(
+			`Finished saving news to database, total of ${filteredNews.length} news saved`
+		);
 
-			const hasKeywordInTitle = userKeyWords.some(word => title.includes(word.toLocaleLowerCase()));
-			const hasKeywordInDesc = userKeyWords.some(word => desc.includes(word.toLocaleLowerCase()));
+		return filteredNews;
+	}
 
-			if (hasKeywordInTitle || hasKeywordInDesc) {
-				// send notification to user
-				this.notifier.notifyNews(news, "joselatines33@gmail.com");
+	private async checkIfNewsHasKeywordsWantedForUsers(
+		newsList: Array<NewsData>
+	) {
+		try {
+			console.debug(
+				`Checking if news has keywords wanted for users. News to analyze ${newsList.length}`
+			);
+			const users = await User.find();
+
+			if (users.length === 0) {
+				return;
 			}
-		});
-		
-		console.debug(`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: ${ntn24.length}`);
-		console.debug(`Finished saving news to database, total of ${filteredNews.length} news saved`);
+
+			users.forEach(user => {
+				const userKeyWords = user.newsWantedWords;
+
+				// check if the news has a keywords for any user
+				newsList.forEach(async (news: NewsData) => {
+					// check if news have user saved tags
+					const title = news.title.toLocaleLowerCase();
+					const desc = news.description.toLocaleLowerCase();
+
+					const hasKeywordInTitle = userKeyWords.some(word =>
+						title.includes(word.toLocaleLowerCase())
+					);
+					const hasKeywordInDesc = userKeyWords.some(word =>
+						desc.includes(word.toLocaleLowerCase())
+					);
+
+					if (hasKeywordInTitle || hasKeywordInDesc) {
+						// send notification to user
+						await this.notifier.notifyNews(news, user.notificationEmail);
+						// save in db that a notification has sent via email
+						const updated_user = await User.findOneAndUpdate(
+							{ _id: user._id },
+							{
+								notifications: [
+									...user.notifications,
+									{
+										id: randomUUID(),
+										title: news.title,
+										description: news.description,
+										url: news.url,
+										news_id: news._id,
+										notification_to: user.notificationEmail,
+										notification_type: "email",
+										sended_at: new Date(),
+										viewed: false,
+										words_detected: [...userKeyWords],
+									},
+								],
+							},
+							{ new: true } // Return the updated document
+						);
+					}
+				});
+			});
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	private async isNewsInDb(title: string) {
 		const existingNews = await News.find({ title });
-		
-		return existingNews.length > 0;
+		return Boolean(existingNews.length > 0);
 	}
 
 	private async openBrowser() {
