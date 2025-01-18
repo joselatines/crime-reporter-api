@@ -3,6 +3,7 @@ import User from '../lib/db/models/user.model';
 import generateTokenAndSetCookie from '../utils/generateToken';
 import { customError } from '../utils/customError';
 
+
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, email, password, role, isActive } = req.body;
