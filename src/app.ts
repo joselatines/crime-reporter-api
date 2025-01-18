@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 import * as middlewares from './middlewares';
 import api from './api';
@@ -18,6 +19,7 @@ app.use(cors({
   origin: 'https://crime-reporter-lime.vercel.app', 
   credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.json());
 
 app.get<{}, MessageResponse>('/', (req, res) => {
