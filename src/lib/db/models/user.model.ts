@@ -1,12 +1,12 @@
 import mongoose, { Document, Model } from 'mongoose';
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   username: string;
   email: string;
   password: string;
-  role: "admin" | "detective";
+  role: 'admin' | 'detective';
   isActive: boolean;
   settings: Object;
   newsWantedWords: string[];
@@ -104,10 +104,10 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-  // Método para comparar contraseñas durante el login
-  userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
-    return await bcrypt.compare(candidatePassword, this.password || "");
-  };
+// Método para comparar contraseñas durante el login
+userSchema.methods.comparePassword = async function (candidatePassword: string) {
+  return bcrypt.compare(candidatePassword, this.password || '');
+};
 
 const User = mongoose.model<IUser, IUserModel>('User', userSchema);
 

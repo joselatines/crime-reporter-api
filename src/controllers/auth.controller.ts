@@ -6,9 +6,11 @@ import { customError } from '../utils/customError';
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, email, password, role, isActive } = req.body;
+    console.log('Datos recibidos para registro:', { username, email, password, role, isActive });
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.error('El usuario ya existe:', email);
       return next(customError(400, 'El correo electrónico ya está registrado.'));
     }
 
@@ -19,6 +21,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       role,
       isActive,
     });
+    console.log('Usuario a guardar:', newUser);
 
     if (newUser) {
       generateTokenAndSetCookie(newUser._id, res);
