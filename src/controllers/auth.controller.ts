@@ -24,6 +24,7 @@ export const user = async (req: Request, res: Response) => {
 };
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body);
   try {
     const { username, email, password, role, isActive } = req.body;
     console.log(req.body);
