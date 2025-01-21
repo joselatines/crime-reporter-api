@@ -14,9 +14,9 @@ dotenv.config();
 
 app.use(morgan('dev'));
 app.use(helmet());
-/* app.use(cors()); */
 app.use(cors({
   origin: 'https://crime-reporter-lime.vercel.app', 
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 app.use(cookieParser());
