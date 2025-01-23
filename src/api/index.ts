@@ -8,6 +8,7 @@ import settings from './settings';
 
 
 import authRoutes from '../routes/auth.routes';
+import usersRoutes from '../routes/users.routes';
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.use('/scrapings', scrapings);
 router.use('/news', news);
 router.use('/auth', authRoutes);
 router.use('/settings', settings);
+router.use('/users', usersRoutes);
 
 
 

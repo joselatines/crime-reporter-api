@@ -3,23 +3,6 @@ import User from '../lib/db/models/user.model';
 import generateTokenAndSetCookie from '../utils/generateToken';
 import { customError } from '../utils/customError';
 
-export const user = async (req: Request, res: Response) => {
-  try {
-    // Consulta para obtener todos los usuarios
-    const users = await User.find().select('-password');
-
-    // Devuelve los usuarios en la respuesta
-    res.status(200).json({
-      message: 'Usuarios obtenidos exitosamente',
-      users,
-    });
-    
-  } catch (error) {
-    console.error('Error al obtener usuarios:', error);
-    res.status(500).json({ error: 'Error al obtener usuarios' });
-  }
-};
-
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   console.log(req.body);
   try {
