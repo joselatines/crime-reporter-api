@@ -8,7 +8,11 @@ export interface IUser extends Document {
   password: string;
   role: 'admin' | 'detective';
   isActive: boolean;
-  settings: Object;
+  settings: {
+    language: string;
+    timezone: string;
+    preferredRegions: string[];
+  };
   newsWantedWords: string[];
   notificationEmail: string;
   notifications: {
@@ -22,6 +26,7 @@ export interface IUser extends Document {
     sended_at: Date;
     viewed: boolean;
     words_detected: string[];
+    crimeType: string[]
   }[];
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -55,8 +60,18 @@ const userSchema = new mongoose.Schema<IUser>({
     default: true,
   },
   settings: {
-    type: Object,
-    default: {}, // Default to an empty object
+    language: {
+      type: String,
+      default: 'es'
+    },
+    timezone: {
+      type: String,
+      default: 'America/Caracas'
+    },
+    preferredRegions: {
+      type: [String],
+      default: []
+    }
   },
   newsWantedWords: {
     type: [String],
@@ -75,6 +90,7 @@ const userSchema = new mongoose.Schema<IUser>({
         news_id: mongoose.Schema.Types.ObjectId,
         notification_to: String,
         notification_type: String,
+        crimeType: [String],
         sended_at: Date,
         viewed: Boolean,
         words_detected: [String], // Array of detected words
