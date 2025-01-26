@@ -12,10 +12,18 @@ import MessageResponse from './interfaces/MessageResponse';
 const app = express();
 dotenv.config();
 
+const allowedOrigins = ["http://localhost:4200", "https://crime-reporter-lime.vercel.app", "http://localhost:5000"];
+
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({
-    origin: "*",
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) { // !origin maneja casos como Postman
+        callback(null, true);
+    } else {
+        callback(new Error("Origen no permitido por CORS"));
+    }
+},
     credentials: true,
 }));
 /* app.use(cors({
