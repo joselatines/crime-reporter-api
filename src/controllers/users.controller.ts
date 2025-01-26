@@ -45,8 +45,21 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    // Completar
+    const userId = req.params.id; 
+    const updateData = req.body; 
+       const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+        new: true, 
+        runValidators: true, 
+      }).select('-password'); 
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
 
+      res.status(200).json({
+        message: 'Usuario actualizado exitosamente',
+        user: updatedUser,
+      });
+   
   } catch (error) {
     console.error('Error al actualizar el usuario:', error);
     res.status(500).json({ error: 'Error al actualizar el usuario' });
@@ -54,9 +67,21 @@ export const updateUser = async (req: Request, res: Response) => {
 };
 
 
+
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    // Completar
+    //indentificar el ID
+    const userId = req.params.id;
+    //buscar y eliminar id de usuario
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    //Respuesta correcta
+    res.status(200).json({
+      message: 'Usuario eliminado exitosamente',
+      user: deletedUser,
+    });
 
   } catch (error) {
     console.error('Error al eliminar el usuario:', error);
