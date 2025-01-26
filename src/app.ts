@@ -25,6 +25,8 @@ app.use(cors({
     }
 },
     credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
 }));
 /* app.use(cors({
   origin: 'https://crime-reporter-lime.vercel.app', 
