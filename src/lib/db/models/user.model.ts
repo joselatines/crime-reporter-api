@@ -62,15 +62,15 @@ const userSchema = new mongoose.Schema<IUser>({
   settings: {
     language: {
       type: String,
-      default: 'es'
+      default: 'es',
     },
     timezone: {
       type: String,
-      default: 'America/Caracas'
+      default: 'America/Caracas',
     },
     preferredRegions: {
       type: [String],
-      default: []
+      default: [],
     }
   },
   newsWantedWords: {

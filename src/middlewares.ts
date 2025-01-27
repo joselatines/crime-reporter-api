@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import { customError } from './utils/customError';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 import ErrorResponse from './interfaces/ErrorResponse';
 import User from './lib/db/models/user.model';
+import { Types } from 'mongoose';
 
-interface JwtPayload {
-  userId: string
+interface JwtPayloadWithUserId extends JwtPayload {
+  userId: Types.ObjectId;
 }
+
 
 export function notFound(req: Request, res: Response, next: NextFunction) {
   res.status(404);
@@ -28,25 +30,27 @@ export function errorHandler(err: Error, req: Request, res: Response<ErrorRespon
 
 export const protectRoute = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Obtener el token desde las cookies
     const token = req.cookies.jwt;
 
     if (!token) {
-      return next(customError(401, 'Unauthorized - No Token Provided'));
+      return next(customError(401, 'Unauthorized - No Token Provided.'));
     }
 
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined in the environment variables');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-    if (!decoded || !decoded.userId) {
-      return next(customError(401, 'Unauthorized - No Token Provided'));
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayloadWithUserId;
+
+    if (!decoded) {
+      return next(customError(401, 'Unauthorized - Invalid Provided.'));
     }
 
     const user = await User.findById(decoded.userId).select('-password');
 
     if (!user) {
-      return next(customError(404, 'Usuario no encontrado'));
+      return next(customError(401, 'Usuario no encontrado.'));
     }
 
     req.user = user;
@@ -54,8 +58,9 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
     next();
   } catch (error) {
     if (error instanceof Error) {
-      console.log('Error in protectRouter middleware:', error.message);
-      next(error);
+      console.log('Error in protectRoute controller', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
+    
   }
 };

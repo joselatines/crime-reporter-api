@@ -20,6 +20,32 @@ export const getUsers = async (req: Request, res: Response) => {
   }
 };
 
+export const getAuthenticatedUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      return next(new Error('User not authenticated.'));
+    }
+
+    // Consulta para obtener todos los usuarios
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('username email role newsWantedWords');
+
+    if (!user) {
+      return next(customError(404, 'Usuario no encontrado.'));
+    }
+
+    // Devuelve los usuarios en la respuesta
+    res.status(200).json({
+      message: 'Usuarios obtenidos exitosamente',
+      user,
+    });
+
+  } catch (error) {
+    console.error('Error al obtener usuario autenticado:', error);
+    res.status(500).json({ error: 'Error al obtener usuarios' });
+  }
+};
+
 
 export const getUserById = async (req: Request, res: Response) => {
   try {
