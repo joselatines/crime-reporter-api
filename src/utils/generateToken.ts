@@ -15,7 +15,8 @@ const generateTokenAndSetCookie = (userId: Types.ObjectId, res: Response) => {
   res.cookie('jwt', token, {
     maxAge: 15 * 24 * 60 * 60 * 1000, // MS
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'none', // Permite cross-site cookies
+    /*     sameSite: 'strict', */
     secure: process.env.NODE_ENV !== 'development',
   });
 };
