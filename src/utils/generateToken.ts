@@ -17,7 +17,7 @@ const generateTokenAndSetCookie = (userId: Types.ObjectId, res: Response) => {
     httpOnly: true,
     /* sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', */ // Permite cross-site cookies
     sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'development' ? false : true, // Solo HTTPS en producción,
+    secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción,
     /* secure: process.env.NODE_ENV !== 'development', */
   });
 };
