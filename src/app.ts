@@ -18,7 +18,7 @@ dotenv.config();
  */
 const allowedOrigins = [
   'http://localhost:4200',
-  'https://crime-reporter-lime.vercel.ap', // Agregar dominio exacto del frontend en producción
+  'https://crime-reporter-lime.vercel.app', // Agregar dominio exacto del frontend en producción
 ];
 
 app.use(morgan('dev'));
