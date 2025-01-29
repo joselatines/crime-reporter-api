@@ -12,11 +12,27 @@ import MessageResponse from './interfaces/MessageResponse';
 const app = express();
 dotenv.config();
 
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://crime-reporter-lime.vercel.app'] // Producción
+  : ['http://localhost:4200', 'http://localhost:5000'];     // Desarrollo
+
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({
-  origin: 'http://localhost:4200', 
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Permitir sin origen (Postman, apps móviles)
+    
+    // Permitir orígenes de la lista blanca + cualquier localhost en desarrollo
+    if (
+      allowedOrigins.includes(origin) || 
+      (process.env.NODE_ENV !== 'production' && origin.includes('localhost'))
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Origen bloqueado por CORS'));
+    }
+  }, 
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
   credentials: true,
 }));
