@@ -24,12 +24,15 @@ const allowedOrigins = [
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && origin.includes('localhost'))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Origen bloqueado'));
+  origin: function (origin, callback) {
+    // bypass the requests with no origin (like curl requests, mobile apps, etc )
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
+      return callback(new Error(msg), false);
     }
+    return callback(null, true);
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
