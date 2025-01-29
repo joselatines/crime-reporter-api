@@ -32,6 +32,7 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
   try {
     // Obtener el token desde las cookies
     const token = req.cookies.jwt;
+    console.log(token);
 
     if (!token) {
       return next(customError(401, 'Unauthorized - No Token Provided.'));
