@@ -29,11 +29,6 @@ export function errorHandler(err: Error, req: Request, res: Response<ErrorRespon
 
 
 export const protectRoute = async (req: Request, res: Response, next: NextFunction) => {
-  // Permitir solicitudes OPTIONS sin autenticación
-  if (req.method === 'OPTIONS') {
-    return next();
-  }
-
   try {
     // Obtener el token desde las cookies
     const token = req.cookies.jwt;
@@ -66,6 +61,6 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
       console.log('Error in protectRoute controller', error.message);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-
+    
   }
 };

@@ -18,8 +18,8 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(cors({
-/*   origin: function (origin, callback) {
+/* app.use(cors({
+  origin: function (origin, callback) {
     if (!origin) return callback(null, true); // Permitir sin origen (Postman, apps móviles)
     
     // Permitir orígenes de la lista blanca + cualquier localhost en desarrollo
@@ -31,18 +31,17 @@ app.use(cors({
     } else {
       callback(new Error('Origen bloqueado por CORS'));
     }
-  },  */
-  origin: 'https://crime-reporter-lime.vercel.app', 
+  },  
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
   credentials: true,
-}));
-/* app.use(cors({
+})); */
+app.use(cors({
   origin: 'https://crime-reporter-lime.vercel.app', 
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
   credentials: true,
-})); */
+}));
 app.use(cookieParser());
 app.use(express.json());
 
