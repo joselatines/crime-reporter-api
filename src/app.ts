@@ -24,7 +24,7 @@ const allowedOrigins = [
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({
-  origin: function (origin, callback) {
+  /* origin: function (origin, callback) {
     // bypass the requests with no origin (like curl requests, mobile apps, etc )
     if (!origin) return callback(null, true);
 
@@ -33,7 +33,8 @@ app.use(cors({
       return callback(new Error(msg), false);
     }
     return callback(null, true);
-  },
+  }, */
+  origin: 'https://crime-reporter-lime.vercel.app', 
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
   credentials: true,
