@@ -12,13 +12,28 @@ import MessageResponse from './interfaces/MessageResponse';
 const app = express();
 dotenv.config();
 
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://crime-reporter-lime.vercel.app', // Agregar dominio exacto del frontend en producción
+];
+
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(cors(
-  {
-    origin: "*"
-  }
-));
+app.use(cors({
+  origin: function (origin, callback) {
+    // bypass the requests with no origin (like curl requests, mobile apps, etc )
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization', 'cache-control'],
+  credentials: true,
+}));
 /* app.use(cors({
   origin: 'https://crime-reporter-lime.vercel.app', 
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
