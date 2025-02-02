@@ -32,7 +32,6 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
   try {
     // Obtener el token desde las cookies
     const token = req.cookies.jwt;
-    console.log(token);
 
     if (!token) {
       return next(customError(401, 'Unauthorized - No Token Provided.'));
@@ -54,6 +53,10 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
       return next(customError(401, 'Usuario no encontrado.'));
     }
 
+    console.log('Token recibido:', token);
+    console.log('Decoded UserId:', decoded.userId);
+
+
     req.user = user;
 
     next();
@@ -62,6 +65,6 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
       console.log('Error in protectRoute controller', error.message);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-    
+
   }
 };
