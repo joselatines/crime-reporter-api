@@ -21,6 +21,8 @@ const generateTokenAndSetCookie = (userId: Types.ObjectId, res: Response) => {
     secure: process.env.NODE_ENV !== 'development', // Solo HTTPS en producción,
     /* secure: process.env.NODE_ENV !== 'development', */
   });
+
+  return token;
 };
 
 export default generateTokenAndSetCookie;

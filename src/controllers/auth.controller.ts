@@ -58,13 +58,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return next(customError(400, 'Contraseña inválida.'));
     }
 
-    generateTokenAndSetCookie(validUser._id, res);
+    const token = generateTokenAndSetCookie(validUser._id, res);
 
     res.status(201).json({
       _id: validUser.id,
       email: validUser.email,
       role: validUser.role,
       isActive: validUser.isActive,
+      token: token,
     });
 
   } catch (error) {
