@@ -11,7 +11,8 @@ router.get('/me', protectRoute, getAuthenticatedUser);
 
 router.get('/:id', protectRoute, getUserById);
 
-router.post('/', protectRoute, createUser);
+router.post('/', createUser);
+/* router.post('/', protectRoute, createUser); */
 
 router.put('/:id', protectRoute, updateUser);
 
