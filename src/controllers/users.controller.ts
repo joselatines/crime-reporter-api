@@ -26,14 +26,14 @@ export const getAuthenticatedUser = async (req: Request, res: Response, next: Ne
     }
 
     // Consulta para obtener todos los usuarios
-    /* const userId = req.user.id;
-    const user = await User.findById(userId).select('-password'); */
+    const userId = req.user._id;
+    const user = await User.findById(userId).select('-password');
     
     /* const user = await User.findById(userId).select('username email role newsWantedWords'); */
 
-    /* if (!user) {
+    if (!user) {
       return next(customError(404, 'Usuario no encontrado.'));
-    } */
+    }
 
     // Devuelve los usuarios en la respuesta
     res.status(200).json({
