@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema<IUser>({
     preferredRegions: {
       type: [String],
       default: [],
-    }
+    },
   },
   newsWantedWords: {
     type: [String],
