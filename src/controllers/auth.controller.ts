@@ -4,7 +4,6 @@ import generateTokenAndSetCookie from '../utils/generateToken';
 import { customError } from '../utils/customError';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
   try {
     const { username, email, password, role, isActive } = req.body;
 
