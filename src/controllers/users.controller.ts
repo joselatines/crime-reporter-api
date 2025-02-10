@@ -37,7 +37,7 @@ export const getAuthenticatedUser = async (req: Request, res: Response, next: Ne
 
     // Devuelve los usuarios en la respuesta
     res.status(200).json({
-      message: 'Usuarios obtenidos exitosamente',
+      message: 'Usuario obtenidos exitosamente',
       user: req.user,
     });
 
@@ -51,13 +51,19 @@ export const getAuthenticatedUser = async (req: Request, res: Response, next: Ne
 export const getUserById = async (req: Request, res: Response) => {
   try {
     // Completar
+    const userId = req.params.id;
+    const user = User.findById(userId).select('-password');
 
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    res.status(200).json({ message: 'Usuario obtenido exitosamente', user });
   } catch (error) {
     console.error('Error al obtener al usuario:', error);
     res.status(500).json({ error: 'Error al obtener al usuario' });
   }
 };
-
 
 export const createUser = async (req: Request, res: Response) => {
   try {
