@@ -1,11 +1,11 @@
 import express from 'express';
-import { getInterviews, postInterviews } from '../controllers/interviews.controller';
+import { getInterviews, createInterview } from '../controllers/interviews.controller';
 
 const router = express.Router();
 
 router.get('/', getInterviews);
 
-router.post('/', postInterviews);
+router.post('/', createInterview);
 
 
 export default router;

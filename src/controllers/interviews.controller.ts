@@ -18,29 +18,52 @@ export const getInterviews = async (req: Request, res: Response) => {
   }
 };
 
-export const postInterviews = async (req: Request, res: Response, next: NextFunction) => {
+export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { declaracion, entrevistadoId } = req.body;
+    const { declaracion, entrevistadoId, entrevistadoData } = req.body;
 
-    // Validar que se proporcionen los datos necesarios
-    if (!declaracion || !entrevistadoId) {
-      return next(customError(400, 'Faltan campos obligatorios.'));
+    // Validación básica
+    if (!declaracion) {
+      return next(customError(400, 'La declaración es obligatoria.'));
     }
 
-    const entrevistado = await InvolvedPerson.findById(entrevistadoId);
-    if (!entrevistado) {
-      return next(customError(400, 'Entrevistado no encontrado.'));
+    let entrevistado;
+
+    // Caso 1: Crear nuevo entrevistado
+    if (entrevistadoData) {
+      if (!entrevistadoData.name || !entrevistadoData.cedula) {
+        return next(customError(400, 'Datos incompletos para el entrevistado.'));
+      }
+
+      entrevistado = new InvolvedPerson(entrevistadoData);
+      await entrevistado.save();
+
+      // Caso 2: Usar entrevistado existente
+    } else if (entrevistadoId) {
+      entrevistado = await InvolvedPerson.findById(entrevistadoId);
+      if (!entrevistado) {
+        return next(customError(400, 'Entrevistado no encontrado.'));
+      }
+
+      // Error si no hay datos válidos
+    } else {
+      return next(customError(400, 'Se requiere un ID de entrevistado o datos para crear uno nuevo.'));
     }
 
+    // Crear la entrevista
     const newInterview = new Interview({
       declaracion,
-      entrevistado: entrevistadoId,
+      entrevistado: entrevistado._id,
     });
 
     await newInterview.save();
 
-    // Enviar la respuesta con la entrevista creada
-    res.status(201).json(newInterview);
+    // Respuesta exitosa
+    res.status(201).json({
+      interview: newInterview,
+      interviewee: entrevistado,
+      message: entrevistadoData ? 'Entrevistado y entrevista creados' : 'Entrevista creada',
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.log('Error in postInterviews controller', error.message);
