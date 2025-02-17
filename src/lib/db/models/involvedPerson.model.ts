@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
 const involvedPersonSchema = new mongoose.Schema({
-  declaracion: {
-    type: String,
-    required: true,
-  },
   name: {
     type: String,
     required: true,
