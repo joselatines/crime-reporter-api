@@ -72,23 +72,39 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
   }
 };
 
-export const updateInterviews = async (req: Request, res: Response) => {
+export const updateInterviews = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const interviewId = req.params.id;
-    const updateData = req.body;
-    // Buscar y actualizar la entrevista
+    const { declaracion, nombre, cedula, edad, profesion } = req.body;
+
+    // Buscar la entrevista para obtener el ID del entrevistado
+    const interview = await Interview.findById(interviewId).populate('entrevistado');
+    if (!interview) {
+      return next(customError(404, 'Entrevista no encontrada.'));
+    }
+
+    //Actualizar el entrevistado (InvolvedPerson)
+    const updateInterviewee = await InvolvedPerson.findByIdAndUpdate(
+      interview.entrevistado._id, // ID del entrevistado
+      { name: nombre, cedula, edad, profesion }, // Campos a actualizar
+      { new: true }, // Devuelve el documento actualizado
+    );
+
+    if (!updateInterviewee) {
+      return next(customError(404, 'Entrevistado no encontrada.'));
+    }
+
     const updatedInterview = await Interview.findByIdAndUpdate(
       interviewId,
-      updateData,
+      { declaracion },
       { new: true }, // Devuelve el documento actualizado
     ).populate('entrevistado');
 
-    if (!updatedInterview) {
-      return res.status(404).json({ error: 'Entrevista no encontrada' });
-    }
-
     // Respuesta exitosa
-    res.status(200).json(updatedInterview);
+    res.status(200).json({
+      interview: updatedInterview,
+      entrevistado: updateInterviewee,
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.log('Error in updateInterviews controller', error.message);
@@ -101,9 +117,9 @@ export const updateInterviews = async (req: Request, res: Response) => {
 export const deleteInterviews = async (req: Request, res: Response) => {
   try {
     //indentificar el ID
-    const interviewId  = req.params.id;
+    const interviewId = req.params.id;
     //buscar y eliminar id de usuario
-    const deletedInterview  = await Interview.findByIdAndDelete(interviewId);
+    const deletedInterview = await Interview.findByIdAndDelete(interviewId);
 
     if (!deletedInterview) {
       return res.status(404).json({ error: 'Entrevista  no encontrada.' });
