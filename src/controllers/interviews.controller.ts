@@ -71,3 +71,51 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
     }
   }
 };
+
+export const updateInterviews = async (req: Request, res: Response) => {
+  try {
+    const interviewId = req.params.id;
+    const updateData = req.body;
+    // Buscar y actualizar la entrevista
+    const updatedInterview = await Interview.findByIdAndUpdate(
+      interviewId,
+      updateData,
+      { new: true }, // Devuelve el documento actualizado
+    ).populate('entrevistado');
+
+    if (!updatedInterview) {
+      return res.status(404).json({ error: 'Entrevista no encontrada' });
+    }
+
+    // Respuesta exitosa
+    res.status(200).json(updatedInterview);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log('Error in updateInterviews controller', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+};
+
+
+export const deleteInterviews = async (req: Request, res: Response) => {
+  try {
+    //indentificar el ID
+    const interviewId  = req.params.id;
+    //buscar y eliminar id de usuario
+    const deletedInterview  = await Interview.findByIdAndDelete(interviewId);
+
+    if (!deletedInterview) {
+      return res.status(404).json({ error: 'Entrevista  no encontrada.' });
+    }
+    //Respuesta correcta
+    res.status(200).json({
+      message: 'Usuario eliminado exitosamente',
+      interview: deletedInterview,
+    });
+
+  } catch (error) {
+    console.error('Error al eliminar el usuario:', error);
+    res.status(500).json({ error: 'Error al eliminar el usuario' });
+  }
+};
