@@ -9,7 +9,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.error('El usuario ya existe:', email);
       return next(customError(400, 'El correo electrónico ya está registrado.'));
     }
 
@@ -20,7 +19,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       role,
       isActive,
     });
-    console.log('Usuario a guardar:', newUser);
 
     if (newUser) {
       generateTokenAndSetCookie(newUser._id, res);

@@ -1,15 +1,16 @@
 import express from 'express';
 import { getInterviews, createInterview, updateInterviews, deleteInterviews } from '../controllers/interviews.controller';
+import { protectRoute } from '../middlewares';
 
 const router = express.Router();
 
-router.get('/', getInterviews);
+router.get('/', protectRoute, getInterviews);
 
-router.post('/', createInterview);
+router.post('/', protectRoute, createInterview);
 
-router.put('/:id', updateInterviews);
+router.put('/:id', protectRoute, updateInterviews);
 
-router.delete('/:id', deleteInterviews);
+router.delete('/:id', protectRoute, deleteInterviews);
 
 
 export default router;

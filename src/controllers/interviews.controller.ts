@@ -126,7 +126,7 @@ export const deleteInterviews = async (req: Request, res: Response) => {
     }
     //Respuesta correcta
     res.status(200).json({
-      message: 'Usuario eliminado exitosamente',
+      message: 'Entrevista eliminado exitosamente',
       interview: deletedInterview,
     });
 
