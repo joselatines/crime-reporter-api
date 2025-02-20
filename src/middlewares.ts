@@ -31,6 +31,7 @@ export function errorHandler(err: Error, req: Request, res: Response<ErrorRespon
 export const protectRoute = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Obtener el token desde las cookies
+    console.log('Cookies recibidas:', req.cookies);
     const token = req.cookies.jwt;
 
     if (!token) {
