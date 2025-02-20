@@ -32,6 +32,8 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
   try {
     // Obtener el token desde las cookies
     console.log('Cookies recibidas:', req.cookies);
+    console.log('JWT_SECRET:', process.env.JWT_SECRET);
+
     const token = req.cookies.jwt;
 
     if (!token) {
