@@ -1,16 +1,18 @@
 import express from 'express';
 import { getPoliceReport, createPoliceReport, updatePoliceReport, deletePoliceReport } from '../controllers/policeReport.controller';
-import { protectRoute } from '../middlewares';
+/* import { protectRoute } from '../middlewares'; */
 
 const router = express.Router();
 
-router.get('/', protectRoute, getPoliceReport);
+// Colocar protectRoute al terminar el desarrollo
 
-router.post('/', protectRoute, createPoliceReport);
+router.get('/', getPoliceReport);
 
-router.put('/:id', protectRoute, updatePoliceReport);
+router.post('/', createPoliceReport);
 
-router.delete('/:id', protectRoute, deletePoliceReport);
+router.put('/:id', updatePoliceReport);
+
+router.delete('/:id', deletePoliceReport);
 
 
 export default router;
