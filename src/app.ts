@@ -43,6 +43,8 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
+
 app.get<{}, MessageResponse>('/', (req, res) => {
   res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
