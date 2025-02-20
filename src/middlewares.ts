@@ -31,10 +31,9 @@ export function errorHandler(err: Error, req: Request, res: Response<ErrorRespon
 export const protectRoute = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Obtener el token desde las cookies
-    console.log('Cookies recibidas:', req.cookies);
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
-    const token = req.cookies.jwt;
+    /* const token = req.cookies.jwt; */
+    const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
       return next(customError(401, 'Unauthorized - No Token Provided.'));
