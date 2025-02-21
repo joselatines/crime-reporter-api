@@ -20,34 +20,52 @@ export const getPoliceReport = async (req: Request, res: Response) => {
 
 export const createPoliceReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { location, description, time, securityMeasures, observations, involvedPeople, evidenceItems } = req.body;
+    const { location, description, time, securityMeasures, observations, involvedPeople, evidenceItems, entrevistadoId, entrevistadoData } = req.body;
 
     // Validar que se proporcionen los datos necesarios
-    if (!location || !description || !time || !securityMeasures || !observations || !involvedPeople || !evidenceItems) {
+    if (!location || !description || !time || !securityMeasures || !observations || !involvedPeople || !evidenceItems || !entrevistadoId || !entrevistadoData) {
       return next(customError(400, 'Faltan campos obligatorios.'));
     }
 
-    // Verificar que las personas involucradas existan
-    const peopleExist = await InvolvedPerson.find({ _id: { $in: involvedPeople } });
-    if (!peopleExist.length !== involvedPeople.length) {
-      return next(customError(400, 'Una o más personas involucradas no existen.'));
+    let entrevistado;
+
+    // Caso 1: Crear nuevo entrevistado
+    if (entrevistadoData) {
+      if (!entrevistadoData.name || !entrevistadoData.cedula) {
+        return next(customError(400, 'Datos incompletos para el entrevistado.'));
+      }
+
+      entrevistado = new InvolvedPerson(entrevistadoData);
+      await entrevistado.save();
+
+      // Caso 2: Usar entrevistado existente
+    } else if (entrevistadoId) {
+      entrevistado = await InvolvedPerson.findById(entrevistadoId);
+      if (!entrevistado) {
+        return next(customError(400, 'Entrevistado no encontrado.'));
+      }
+
+    } else {
+      return next(customError(400, 'Se requiere un ID de entrevistado o datos para crear uno nuevo.'));
     }
 
     // Crear y guardar el nuevo reporte policial
-    const newPoliceReports = new PoliceReport({
+    const newPoliceReport = new PoliceReport({
       location,
       description,
       time,
       securityMeasures,
       observations,
-      involvedPeople,
-      evidenceItems,
+      entrevistado: entrevistado._id,
     });
 
-    await newPoliceReports.save();
+    await newPoliceReport.save();
 
-    // Enviar la respuesta con la entrevista creada
-    res.status(201).json(newPoliceReports);
+    res.status(201).json({
+      report: newPoliceReport,
+      entrevistado,
+      message: entrevistadoData ? 'Entrevistado y reporte creados' : 'Reporte creado',
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.log('Error in createPoliceReport controller', error.message);
