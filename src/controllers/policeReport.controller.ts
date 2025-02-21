@@ -20,33 +20,34 @@ export const getPoliceReport = async (req: Request, res: Response) => {
 
 export const createPoliceReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { location, description, time, securityMeasures, observations, involvedPeople, evidenceItems, entrevistadoId, entrevistadoData } = req.body;
+    const { location, description, time, securityMeasures, observations, involvedPeople = [], evidenceItems = [], entrevistadoId, entrevistadoData } = req.body;
 
     // Validar que se proporcionen los datos necesarios
-    if (!location || !description || !time || !securityMeasures || !observations || !involvedPeople || !evidenceItems || !entrevistadoId || !entrevistadoData) {
+    if (!location || !description || !time || !securityMeasures || !observations) {
       return next(customError(400, 'Faltan campos obligatorios.'));
     }
+
+    if (!entrevistadoId && !entrevistadoData) {
+      return next(customError(400, 'Se requiere un ID de entrevistado o datos para crear uno nuevo.'));
+    }
+
 
     let entrevistado;
 
     // Caso 1: Crear nuevo entrevistado
     if (entrevistadoData) {
-      if (!entrevistadoData.name || !entrevistadoData.cedula) {
+      const { name, cedula } = entrevistadoData;
+      if (!name || !cedula) {
         return next(customError(400, 'Datos incompletos para el entrevistado.'));
       }
 
       entrevistado = new InvolvedPerson(entrevistadoData);
       await entrevistado.save();
-
-      // Caso 2: Usar entrevistado existente
-    } else if (entrevistadoId) {
+    } else { // Caso 2: Usar entrevistado existente
       entrevistado = await InvolvedPerson.findById(entrevistadoId);
       if (!entrevistado) {
         return next(customError(400, 'Entrevistado no encontrado.'));
       }
-
-    } else {
-      return next(customError(400, 'Se requiere un ID de entrevistado o datos para crear uno nuevo.'));
     }
 
     // Crear y guardar el nuevo reporte policial
@@ -56,7 +57,8 @@ export const createPoliceReport = async (req: Request, res: Response, next: Next
       time,
       securityMeasures,
       observations,
-      entrevistado: [...involvedPeople, entrevistado._id],
+      involvedPeople: [...(involvedPeople || []), entrevistado._id], // Agrega el entrevistado sin borrar otros IDs
+      evidenceItems,
     });
 
     await newPoliceReport.save();
