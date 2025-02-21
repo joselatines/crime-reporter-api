@@ -56,7 +56,7 @@ export const createPoliceReport = async (req: Request, res: Response, next: Next
       time,
       securityMeasures,
       observations,
-      entrevistado: entrevistado._id,
+      entrevistado: [...involvedPeople, entrevistado._id],
     });
 
     await newPoliceReport.save();
