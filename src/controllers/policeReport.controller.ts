@@ -36,9 +36,15 @@ export const createPoliceReport = async (req: Request, res: Response, next: Next
 
     // Caso 1: Crear nuevo entrevistado
     if (entrevistadoData) {
-      const { name, cedula } = entrevistadoData;
-      if (!name || !cedula) {
+      const { name, cedula, role, edad } = entrevistadoData;
+      if (!name || !cedula || !role || !edad) {
         return next(customError(400, 'Datos incompletos para el entrevistado.'));
+      }
+
+      // Validar formato de cédula
+      const cedulaRegex = /^[VvEe]-?\d{6,8}$/;
+      if (!cedulaRegex.test(cedula)) {
+        return next(customError(400, 'Formato de cédula inválido. Debe ser V-1234567 o E12345678.'));
       }
 
       entrevistado = new InvolvedPerson(entrevistadoData);
