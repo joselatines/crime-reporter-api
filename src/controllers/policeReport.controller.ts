@@ -20,6 +20,70 @@ export const getPoliceReport = async (req: Request, res: Response) => {
 
 export const createPoliceReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { location, description, time, securityMeasures, observations, involvedPeople = [], evidenceItems = [] } = req.body;
+
+    // Validar que se proporcionen los datos necesarios
+    if (!location || !description || !time || !securityMeasures || !observations) {
+      return next(customError(400, 'Faltan campos obligatorios.'));
+    }
+
+    // Array para almacenar los IDs de las personas involucradas
+    const involvedPeopleIds = [];
+
+    // Procesar cada persona involucrada (si existen)
+    for (const personData of involvedPeople) {
+      const { name, cedula, role, edad } = personData;
+
+      // Validar campos obligatorios de la persona
+      if (!name || !cedula || !role || !edad) {
+        return next(customError(400, 'Datos incompletos para una persona involucrada.'));
+      }
+
+      // Validar rol
+      const rolesPermitidos = ['testigo', 'sospechoso', 'víctima'];
+      if (!rolesPermitidos.includes(role)) {
+        return next(customError(400, `Rol inválido para ${name}. Los valores permitidos son: testigo, sospechoso, víctima.`));
+      }
+
+      // Buscar si la persona ya existe en la base de datos
+      let person = await InvolvedPerson.findOne({ cedula });
+
+      if (!person) {
+        // Si no existe, crear una nueva persona
+        person = new InvolvedPerson(personData);
+        await person.save();
+      }
+
+      // Agregar el ID de la persona al array
+      involvedPeopleIds.push(person._id);
+    }
+
+    // Crear y guardar el nuevo reporte policial
+    const newPoliceReport = new PoliceReport({
+      location,
+      description,
+      time,
+      securityMeasures,
+      observations,
+      involvedPeople: involvedPeopleIds, // Asignar los IDs de las personas involucradas (puede estar vacío)
+      evidenceItems,
+    });
+
+    await newPoliceReport.save();
+
+    res.status(201).json({
+      report: newPoliceReport,
+      message: 'Reporte creado exitosamente.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log('Error in createPoliceReport controller', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+};
+/* export const createPoliceReport = async (req: Request, res: Response, next: NextFunction) => {
+  try {
     const { location, description, time, securityMeasures, observations, involvedPeople = [], evidenceItems = [], entrevistadoId, entrevistadoData } = req.body;
 
     // Validar que se proporcionen los datos necesarios
@@ -80,7 +144,7 @@ export const createPoliceReport = async (req: Request, res: Response, next: Next
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
-};
+}; */
 
 export const updatePoliceReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
