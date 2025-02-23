@@ -20,7 +20,7 @@ export const getPoliceReport = async (req: Request, res: Response) => {
 
 export const createPoliceReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { location, description, time, securityMeasures, observations, involvedPeople = [], evidenceItems = [] } = req.body;
+    const { location, description, time, securityMeasures, observations, involvedPeople = [], evidenceItems = [], attachments } = req.body;
 
     // Validar que se proporcionen los datos necesarios
     if (!location || !description || !time || !securityMeasures || !observations) {
@@ -67,6 +67,7 @@ export const createPoliceReport = async (req: Request, res: Response, next: Next
       observations,
       involvedPeople: involvedPeopleIds, // Asignar los IDs de las personas involucradas (puede estar vacío)
       evidenceItems,
+      attachments,
     });
 
     await newPoliceReport.save();
@@ -149,7 +150,7 @@ export const createPoliceReport = async (req: Request, res: Response, next: Next
 export const updatePoliceReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const policeReportId = req.params.id;
-    const { location, description, time, securityMeasures, observations, involvedPeople, evidenceItems } = req.body;
+    const { location, description, time, securityMeasures, observations, involvedPeople, evidenceItems, attachments } = req.body;
 
     const policeReport = await PoliceReport.findById(policeReportId);
     if (!policeReport) {
@@ -175,6 +176,7 @@ export const updatePoliceReport = async (req: Request, res: Response, next: Next
         observations,
         involvedPeople, // Se actualiza con los nuevos IDs
         evidenceItems,
+        attachments,
       },
       { new: true },
     ).populate('involvedPeople');
