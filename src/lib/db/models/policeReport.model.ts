@@ -28,6 +28,9 @@ const policeReportSchema = new mongoose.Schema({
   evidenceItems: [{
     type: String,
   }],
+  attachments: [{
+    type: String,
+  }],
 });
 
 const PoliceReport = mongoose.model('PoliceReport', policeReportSchema);
