@@ -69,4 +69,38 @@ router.get<CommentParams, any>("/:newsId/comments", async (req, res) => {
     }
 });
 
+// Obtener noticias filtradas por palabras clave
+router.get("/filtered-news", async (req, res) => {
+    try {
+        // Obtener las palabras clave del query parameter
+        const keywords = req.query.keywords as string;
+
+        if (!keywords) {
+            return res.status(400).json({ message: "Se requieren palabras clave para filtrar." });
+        }
+
+        // Normalizar las palabras clave
+        const normalizedKeywords = keywords
+            .toLowerCase()
+            .split(',')
+            .map((keyword) => keyword.trim());
+
+        // Filtrar noticias basadas en las palabras clave
+        const filteredNews = await News.find({
+            $or: [
+                { title: { $in: normalizedKeywords.map((keyword) => new RegExp(keyword, 'i')) } },
+                { description: { $in: normalizedKeywords.map((keyword) => new RegExp(keyword, 'i')) } },
+                { content: { $in: normalizedKeywords.map((keyword) => new RegExp(keyword, 'i')) } },
+                { tags: { $in: normalizedKeywords } },
+            ],
+        });
+
+        // Devolver las noticias filtradas
+        res.status(200).json({ message: "Noticias filtradas", data: filteredNews });
+    } catch (error) {
+        console.error('Error al filtrar noticias:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' });
+    }
+});
+
 export default router;
