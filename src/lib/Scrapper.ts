@@ -4,8 +4,7 @@ import puppeteer, { Browser } from "puppeteer";
 import { NewsData } from "../interfaces/Database";
 import { News } from "./db/models/News";
 import { Notifier } from "./Notifiers";
-import User  from "../lib/db/models/user.model";
-import { NewsData } from "../interfaces/Database";
+import User from "../lib/db/models/user.model";
 import { randomUUID } from "crypto";
 
 export default class Scrapper {
@@ -53,10 +52,10 @@ export default class Scrapper {
 
 		await this.checkIfNewsHasKeywordsWantedForUsers(filteredNews);
 
-		console.debug(
+		console.log(
 			`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: ${ntn24.length}`
 		);
-		console.debug(
+		console.log(
 			`Finished saving news to database, total of ${filteredNews.length} news saved`
 		);
 
@@ -132,21 +131,35 @@ export default class Scrapper {
 
 	private async openBrowser() {
 		console.log("Opening browser...");
-		const browser = await puppeteer.launch({
-			headless: true,
-			args: [
-				"--disable-setuid-sandbox",
-				"--no-sandbox",
-				"--single-process",
-				"--no-zygote",
-			],
-			executablePath:
-				process.env.NODE_ENV === "production"
-					? process.env.PUPPETEER_EXECUTABLE_PATH
-					: puppeteer.executablePath(),
-		});
-		console.log("Browser opened");
-		return browser;
+		try {
+			// Log environment information for debugging
+			console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+			console.log(`PUPPETEER_EXECUTABLE_PATH: ${process.env.PUPPETEER_EXECUTABLE_PATH}`);
+			console.log(`Default executablePath: ${puppeteer.executablePath()}`);
+			
+			const execPath = process.env.NODE_ENV === "production"
+				? process.env.PUPPETEER_EXECUTABLE_PATH
+				: puppeteer.executablePath();
+			
+			console.log(`Using Chrome at path: ${execPath}`);
+			
+			const browser = await puppeteer.launch({
+				headless: true,
+				args: [
+					"--disable-setuid-sandbox",
+					"--no-sandbox",
+					"--single-process",
+					"--no-zygote",
+				],
+				executablePath: execPath,
+				ignoreHTTPSErrors: true,
+			});
+			console.log("Browser opened successfully");
+			return browser;
+		} catch (error) {
+			console.error("Failed to launch browser:", error);
+			throw new Error(`Browser launch failed: ${error.message}`);
+		}
 	}
 
 	private async closeBrowser() {
