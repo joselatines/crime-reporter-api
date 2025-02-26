@@ -135,14 +135,24 @@ export default class Scrapper {
 			// Log environment information for debugging
 			console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 			console.log(`PUPPETEER_EXECUTABLE_PATH: ${process.env.PUPPETEER_EXECUTABLE_PATH}`);
-			console.log(`Default executablePath: ${puppeteer.executablePath()}`);
 			
-			const execPath = process.env.NODE_ENV === "production"
-				? process.env.PUPPETEER_EXECUTABLE_PATH
-				: puppeteer.executablePath();
+			// Check if Chrome exists at the specified path
+			const fs = require('fs');
+			const execPath = process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath();
 			
-			console.log(`Using Chrome at path: ${execPath}`);
+			try {
+				if (fs.existsSync(execPath)) {
+					console.log(`Chrome exists at path: ${execPath}`);
+				} else {
+					console.warn(`Warning: Chrome not found at path: ${execPath}`);
+				}
+			} catch (err) {
+				console.warn(`Error checking Chrome path: ${err.message}`);
+			}
 			
+			console.log(`Launching browser with Chrome at path: ${execPath}`);
+			
+			// Launch with more robust options
 			const browser = await puppeteer.launch({
 				headless: true,
 				args: [
@@ -150,14 +160,43 @@ export default class Scrapper {
 					"--no-sandbox",
 					"--single-process",
 					"--no-zygote",
+					"--disable-dev-shm-usage",
+					"--disable-gpu",
+					"--no-first-run",
+					"--no-default-browser-check",
 				],
 				executablePath: execPath,
 				ignoreHTTPSErrors: true,
+				timeout: 30000, // 30 seconds timeout
 			});
+			
 			console.log("Browser opened successfully");
 			return browser;
 		} catch (error) {
 			console.error("Failed to launch browser:", error);
+			
+			// Try to launch without specifying executablePath as a fallback
+			if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+				console.log("Attempting to launch browser without specifying executablePath...");
+				try {
+					const browser = await puppeteer.launch({
+						headless: true,
+						args: [
+							"--disable-setuid-sandbox",
+							"--no-sandbox",
+							"--single-process",
+							"--no-zygote",
+							"--disable-dev-shm-usage",
+						],
+						ignoreHTTPSErrors: true,
+					});
+					console.log("Browser opened successfully with fallback method");
+					return browser;
+				} catch (fallbackError) {
+					console.error("Fallback browser launch also failed:", fallbackError);
+				}
+			}
+			
 			throw new Error(`Browser launch failed: ${error.message}`);
 		}
 	}
