@@ -44,13 +44,12 @@ router.get<{}, any>("/", async (req, res) => {
 		await scraper.init();
 		
 		console.log("Saving news to database...");
-		const news = await scraper.saveNewsIntoDatabase();
-		
-		console.log(`Scraping completed successfully. Found ${news.length} new articles.`);
+		const news = scraper.saveNewsIntoDatabase();
+
 		res.json({ 
-			message: "Scrapping completed", 
+			message: "Scrapping processing...", 
 			success: true,
-			newsCount: news.length,
+			newsCount: 0,
 			chromeInstalled,
 			timestamp: new Date().toISOString()
 		});

@@ -28,8 +28,8 @@ export default class Scrapper {
 		console.log("Starting news scraping...");
 		const ultimasNoticias = await this.getNewsUltimasNoticias();
 		const elNacional = await this.getNewsElNacional();
-		const ntn24 = await this.getNewsNTN24();
-		const allNews = [...ultimasNoticias, ...elNacional, ...ntn24];
+		// const ntn24 = await this.getNewsNTN24();
+		const allNews = [...ultimasNoticias, ...elNacional];
 
 		const filteredNews = (
 			await Promise.all(
@@ -46,14 +46,14 @@ export default class Scrapper {
 			const newNews = new News(news);
 			newNews
 				.save()
-				.then(() => console.log(`New news saved: ${newNews.title}`))
+				.then(() => console.log(`Saved noticia: ${newNews.title}`))
 				.catch(e => console.log(e));
 		});
 
 		await this.checkIfNewsHasKeywordsWantedForUsers(filteredNews);
 
 		console.log(
-			`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: ${ntn24.length}`
+			`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: 0`
 		);
 		console.log(
 			`Finished saving news to database, total of ${filteredNews.length} news saved`
@@ -125,8 +125,8 @@ export default class Scrapper {
 	}
 
 	private async isNewsInDb(title: string) {
-		const existingNews = await News.find({ title });
-		return Boolean(existingNews.length > 0);
+		const existingNews = await News.findOne({ title });
+		return Boolean(existingNews);
 	}
 
 	private async openBrowser() {
@@ -217,7 +217,7 @@ export default class Scrapper {
 		try {
 			console.info("Scrapping ultimas noticias");
 
-			await page.goto(url, { timeout: 0 });
+			await page.goto(url);
 			console.info("Starting getting news");
 			const newsPosts = await page.evaluate(() => {
 				const articleElements = document.querySelectorAll(
@@ -253,6 +253,7 @@ export default class Scrapper {
 						authorUrl,
 						author,
 						publishedAt,
+						sourceWebsite: "ultimasnoticias.com.ve",
 					};
 				});
 				return posts;
@@ -290,7 +291,7 @@ export default class Scrapper {
 						.querySelector(".img-a img")
 						?.getAttribute("src");
 					const publishedAt = postElement.querySelector(".date")?.textContent;
-					posts.push({ title, description, link, imgUrl, publishedAt });
+					posts.push({ title, description, url:link, imgUrl, publishedAt, sourceWebsite: "ntn24.com" });
 				}
 				return posts;
 			});
@@ -330,7 +331,7 @@ export default class Scrapper {
 						?.getAttribute("src");
 					const publishedAt =
 						postElement.querySelector(".meta time")?.textContent;
-					posts.push({ title, description, link, imgUrl, publishedAt });
+					posts.push({ title, description, url:link, imgUrl, publishedAt, sourceWebsite: "elnacional.com" });
 				}
 				return posts;
 			});

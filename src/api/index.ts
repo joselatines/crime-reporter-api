@@ -11,6 +11,7 @@ import authRoutes from '../routes/auth.routes';
 import usersRoutes from '../routes/users.routes';
 import interviewsRoutes from '../routes/interviews.routes';
 import policeReportRoutes from '../routes/policeReport.routes';
+import commentsRoutes from '../routes/comments.routes';
 
 const router = express.Router();
 
@@ -28,7 +29,7 @@ router.use('/settings', settings);
 router.use('/users', usersRoutes);
 router.use('/interviews', interviewsRoutes);
 router.use('/report', policeReportRoutes);
-
+router.use('/comments', commentsRoutes);
 
 
 
