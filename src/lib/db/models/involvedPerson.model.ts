@@ -9,7 +9,7 @@ const involvedPersonSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: /^[VvEe]-?\d{6,8}$/, // Formato: V-1234567 o E-12345678
+    match: /^[VvEe]-?\d{0,8}$/, // Formato: V-1234567 o E-12345678
   },
   role: {
     type: String,
