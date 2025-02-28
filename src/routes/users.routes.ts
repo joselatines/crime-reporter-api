@@ -9,12 +9,12 @@ router.get('/', getUsers);
 
 router.get('/me', protectRoute, getAuthenticatedUser);
 
-router.get('/:id', protectRoute, getUserById);
+router.get('/:id',getUserById);
 
 router.post('/', createUser);
 /* router.post('/', protectRoute, createUser); */
 
-router.put('/:id', protectRoute, updateUser);
+router.put('/:id', updateUser);
 
 router.delete('/:id', protectRoute, deleteUser);
 

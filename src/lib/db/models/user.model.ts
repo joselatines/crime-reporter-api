@@ -12,6 +12,7 @@ export interface IUser extends Document {
     language: string;
     timezone: string;
     preferredRegions: string[];
+    sourceWebsitesToScrape: string[];
   };
   newsWantedWords: string[];
   notificationEmail: string;
@@ -72,6 +73,12 @@ const userSchema = new mongoose.Schema<IUser>({
       type: [String],
       default: [],
     },
+
+    sourceWebsitesToScrape: {
+      type: [String],
+      default: ["ultimasNoticias", "elNacional", "ntn24"],
+    },
+
   },
   newsWantedWords: {
     type: [String],

@@ -52,12 +52,12 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     // Completar
     const userId = req.params.id;
-    const user = User.findById(userId).select('-password');
+    const user = await User.findById(userId).select('-password')
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado.' });
     }
-
+   
     res.status(200).json({ message: 'Usuario obtenido exitosamente', user });
   } catch (error) {
     console.error('Error al obtener al usuario:', error);
@@ -80,6 +80,7 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id; 
     const updateData = req.body; 
+    console.log({updateData})
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true, 
       runValidators: true, 
