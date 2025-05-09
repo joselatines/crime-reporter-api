@@ -17,7 +17,7 @@ interface CommentBody {
 
 
 router.get<{}, any>("/", async (req, res) => {
-	const allNews = await News.find();
+	const allNews = await News.find().sort({ createdAt: -1 });
 	res.json({ message: "All news", data: allNews });
 });
 

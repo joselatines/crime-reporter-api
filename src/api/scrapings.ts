@@ -44,13 +44,14 @@ router.get<{}, any>("/", async (req, res) => {
 		await scraper.init();
 		
 		console.log("Saving news to database...");
-		const news = scraper.saveNewsIntoDatabase();
+		/* const news = await scraper.updateNTN24Images(); */
+		const news = await scraper.saveNewsIntoDatabase();
 
 		res.json({ 
 			message: "Scrapping processing...", 
 			success: true,
-			newsCount: 0,
-			chromeInstalled,
+			data: news,
+			newsCount: Array.isArray(news) ? news.length : 0,
 			timestamp: new Date().toISOString()
 		});
 	} catch (error) {
