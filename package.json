@@ -29,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
     "morgan": "^1.10.0",
+    "multer": "^2.0.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.16",
     "puppeteer": "^23.11.1"
@@ -41,6 +42,7 @@
     "@types/jest": "^29.5.13",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/morgan": "^1.9.9",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.7.5",
     "@types/nodemailer": "^6.4.17",
     "@types/supertest": "^6.0.2",
