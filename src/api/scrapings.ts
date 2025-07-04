@@ -5,6 +5,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 const router = express.Router();
+let scrapperIsRunning = false;
 
 // Helper function to check if Chrome is installed
 async function checkChromeInstallation() {
@@ -27,6 +28,11 @@ async function checkChromeInstallation() {
 
 router.get<{}, any>("/", async (req, res) => {
 	try {
+		if (scrapperIsRunning) {
+			return res.status(400).json({ message: "Scrapper is already running", success: false });
+		}
+		
+		scrapperIsRunning = true;
 		console.log("Starting scraping process...");
 		console.log(`Running in ${process.env.NODE_ENV || 'development'} mode`);
 		
@@ -77,7 +83,18 @@ router.get<{}, any>("/", async (req, res) => {
 			stack: process.env.NODE_ENV === 'development' ? errorStack : undefined,
 			timestamp: new Date().toISOString()
 		});
+	} finally {
+		scrapperIsRunning = false;
 	}
+});
+
+router.get<{}, any>("/status", async (req, res) => {
+	res.json({ 
+		message: "Scrapper status", 
+		success: true,
+		isRunning: scrapperIsRunning,
+		timestamp: new Date().toISOString()
+	});
 });
 
 export default router;
