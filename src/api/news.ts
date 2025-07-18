@@ -24,7 +24,7 @@ router.get<{}, any>("/", async (req, res) => {
 
         if (sources) {
             const sourceArray = (sources as string).split(',');
-            query = { source: { $in: sourceArray } };
+            query = { sourceWebsite: { $in: sourceArray } };
         }
 
         const allNews = await News.find(query).sort({ createdAt: -1 });
