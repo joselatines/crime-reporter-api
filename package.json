@@ -29,7 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
     "morgan": "^1.10.0",
-    "multer": "^2.0.1",
+    "multer": "^2.0.2",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.16",
     "puppeteer": "^23.11.1"

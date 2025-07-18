@@ -17,8 +17,22 @@ interface CommentBody {
 
 
 router.get<{}, any>("/", async (req, res) => {
-	const allNews = await News.find().sort({ createdAt: -1 });
-	res.json({ message: "All news", data: allNews });
+    try {
+        const { sources } = req.query;
+        let query = {};
+
+
+        if (sources) {
+            const sourceArray = (sources as string).split(',');
+            query = { source: { $in: sourceArray } };
+        }
+
+        const allNews = await News.find(query).sort({ createdAt: -1 });
+        res.json({ message: "All news", data: allNews });
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        res.status(500).json({ message: 'Error interno del servidor al obtener noticias.' });
+    }
 });
 
 // Agregar un comentario a una noticia

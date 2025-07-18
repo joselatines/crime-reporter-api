@@ -99,6 +99,27 @@ export default class Scrapper {
 		return { updated: updatedCount, notFound: notFoundCount, errorCount: errorCount };
 	}
 
+	public async deleteOldNTN24(): Promise<{ deletedCount: number, errorCount: number }> {
+        console.log("Starting deletion of old NTN24 news with default SVG image URL...");
+        const svgDefaultURL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3C/svg%3E";
+        let deletedCount = 0;
+        let errorCount = 0;
+
+        try {
+            const result = await News.deleteMany({
+                sourceWebsite: "ntn24.com",
+                imgUrl: svgDefaultURL,
+            });
+            deletedCount = result.deletedCount;
+            console.log(`Successfully deleted ${deletedCount} old NTN24 news items.`);
+        } catch (error) {
+            errorCount++;
+            console.error("Error deleting old NTN24 news:", error);
+        }
+
+        return { deletedCount, errorCount };
+    }
+
 	private async checkIfNewsHasKeywordsWantedForUsers(
 		newsList: Array<NewsData>
 	) {
