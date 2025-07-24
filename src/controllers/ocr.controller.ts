@@ -25,7 +25,7 @@ export const createOcr = async (req: Request, res: Response, next: NextFunction)
 
 export const getAllOcrs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const ocrs = await Ocr.find().populate('user_id', 'user_id');
+    const ocrs = await Ocr.find().sort({ createdAt: -1 }).populate('user_id', 'user_id');
     res.status(200).json(ocrs);
   } catch (error) {
     next(error);
