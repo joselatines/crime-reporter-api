@@ -142,14 +142,31 @@ export default class Scrapper {
 					const title = news.title.toLocaleLowerCase();
 					const desc = news.description.toLocaleLowerCase();
 
-					const hasKeywordInTitle = userKeyWords.some(word =>
-						title.includes(word.toLocaleLowerCase())
-					);
-					const hasKeywordInDesc = userKeyWords.some(word =>
-						desc.includes(word.toLocaleLowerCase())
-					);
+					console.log("🔍 Keywords to match:", userKeyWords);
+
+					console.log("🔡 Title:", title);
+					console.log("🔡 Description:", desc);
+
+					
+					const hasKeywordInTitle = userKeyWords.some(word => {
+						const match = title.includes(word.toLocaleLowerCase());
+						console.log(`🔎 Checking title for keyword "${word}": ${match ? "✅ Found" : "❌ Not found"}`);
+						return match;
+					});
+
+					const hasKeywordInDesc = userKeyWords.some(word => {
+						const match = desc.includes(word.toLocaleLowerCase());
+						console.log(`🔎 Checking description for keyword "${word}": ${match ? "✅ Found" : "❌ Not found"}`);
+						return match;
+					});
+
+					console.log("📌 Keyword found in title:", hasKeywordInTitle ? "✅ Yes" : "❌ No");
+					console.log("📌 Keyword found in description:", hasKeywordInDesc ? "✅ Yes" : "❌ No");
+
+					
 
 					if (hasKeywordInTitle || hasKeywordInDesc) {
+						console.log("✅ Sending notification...")
 						// send notification to user
 						await this.notifier.notifyNews(news, user.notificationEmail);
 						// save in db that a notification has sent via email
