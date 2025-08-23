@@ -135,14 +135,14 @@ export default class Scrapper {
 
 			users.forEach(user => {
 				const userKeyWords = user.newsWantedWords;
-
+				console.log("🔍 Keywords to match:", userKeyWords);
+				
 				// check if the news has a keywords for any user
 				newsList.forEach(async (news: NewsData) => {
 					// check if news have user saved tags
 					const title = news.title.toLocaleLowerCase();
 					const desc = news.description.toLocaleLowerCase();
 
-					console.log("🔍 Keywords to match:", userKeyWords);
 
 					console.log("🔡 Title:", title);
 					console.log("🔡 Description:", desc);
@@ -150,20 +150,13 @@ export default class Scrapper {
 					
 					const hasKeywordInTitle = userKeyWords.some(word => {
 						const match = title.includes(word.toLocaleLowerCase());
-						console.log(`🔎 Checking title for keyword "${word}": ${match ? "✅ Found" : "❌ Not found"}`);
 						return match;
 					});
 
 					const hasKeywordInDesc = userKeyWords.some(word => {
 						const match = desc.includes(word.toLocaleLowerCase());
-						console.log(`🔎 Checking description for keyword "${word}": ${match ? "✅ Found" : "❌ Not found"}`);
 						return match;
 					});
-
-					console.log("📌 Keyword found in title:", hasKeywordInTitle ? "✅ Yes" : "❌ No");
-					console.log("📌 Keyword found in description:", hasKeywordInDesc ? "✅ Yes" : "❌ No");
-
-					
 
 					if (hasKeywordInTitle || hasKeywordInDesc) {
 						console.log("✅ Sending notification...")
