@@ -50,7 +50,7 @@ export default class Scrapper {
 				.catch(e => console.log(e));
 		});
 
-		await this.checkIfNewsHasKeywordsWantedForUsers(allNews);
+		await this.checkIfNewsHasKeywordsWantedForUsers(filteredNews);
 
 		console.log(
 			`Saved from ultimas noticias: ${ultimasNoticias.length}, from El Nacional: ${elNacional.length}, from NTN24: 0`
